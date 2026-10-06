@@ -1,5 +1,6 @@
 import { PDFDocument, rgb, StandardFonts } from 'pdf-lib';
-import { saveAs } from 'file-saver';
+import fileSaver from 'file-saver';
+const { saveAs } = fileSaver;
 import type { TenderData, UploadedFile, RequirementMatch } from '../types/tender';
 
 export async function generatePackage(
