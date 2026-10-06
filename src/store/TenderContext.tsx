@@ -137,7 +137,7 @@ function reducer(state: TenderState, action: TenderAction): TenderState {
     case 'TOGGLE_SIGNATURE': {
       const matches = state.matches.map((m) =>
         m.requirementId === action.payload
-          ? { ...m, applySignature: !m.applySignature }
+          ? { ...m, applySignature: m.applySignature === undefined ? false : !m.applySignature }
           : m
       );
       return { ...state, matches };
