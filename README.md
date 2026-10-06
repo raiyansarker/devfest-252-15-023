@@ -16,7 +16,9 @@ Designed for speed, privacy, and zero server costs—everything runs directly in
 
 ### 🌟 Bonus Features Implemented
 1. **Seal & Signature Overlay:** Upload a transparent PNG signature or company seal. The generator automatically scales and stamps it onto the bottom-right corner of every generated page in the final PDF!
-2. **Auto-Match Algorithm:** Employs a robust Levenshtein distance matrix scoring system and bilingual keyword matching (with stop-words filter) to magically guess and assign uploaded PDFs to the correct requirements instantly.
+2. **Dual Auto-Match Algorithms:** 
+   - **Local Heuristics:** Employs a robust Levenshtein distance matrix scoring system and bilingual keyword matching (with stop-words filter) to guess assignments.
+   - **AI Auto-Match (Gemini):** Plug in your Google Gemini API key to let an advanced LLM instantly map complex or vaguely named files to the exact tender requirements!
 3. **Export Checklist as CSV:** Instantly export the current requirement list, matched file names, page counts, and live statuses to a clean `.csv` file for offline sharing and review.
 4. **State Persistence & "Start Over":** Your progress is automatically saved to the browser's `IndexedDB`. If you refresh or close the tab, everything—including your mapped PDFs—is restored. Want a clean slate? Hit the "Start Over" button.
 5. **Perfect Bengali Text Rendering in PDFs:** Standard PDF engines break Indic scripts. This app uses an advanced HTML5 Canvas text-to-image engine under the hood to ensure Bengali text on the PDF Index Page is shaped and rendered *flawlessly*.

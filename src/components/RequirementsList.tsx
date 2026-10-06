@@ -5,10 +5,14 @@ import { StatusBadge } from './StatusBadge';
 
 import { exportChecklistCsv } from '../utils/csvExport';
 
+import { useState } from 'react';
+import { aiAutoMatchFiles } from '../utils/aiAutoMatch';
+
 export function RequirementsList() {
   const { t, lang } = useI18n();
   const { tenderData, uploadedFiles, matches, signatureDataUrl } = useTender();
   const dispatch = useTenderDispatch();
+  const [isAiMatching, setIsAiMatching] = useState(false);
 
   if (!tenderData) return null;
 
@@ -19,18 +23,58 @@ export function RequirementsList() {
     matches.filter((m) => m.fileId).map((m) => m.fileId!)
   );
 
+  const handleAiMatch = async () => {
+    let apiKey = localStorage.getItem('geminiApiKey');
+    if (!apiKey) {
+      apiKey = prompt('Please enter your Gemini API Key to use AI Auto-Match:');
+      if (apiKey) {
+        localStorage.setItem('geminiApiKey', apiKey);
+      } else {
+        return;
+      }
+    }
+
+    setIsAiMatching(true);
+    try {
+      const aiMatches = await aiAutoMatchFiles(apiKey, requirements, uploadedFiles);
+      for (const [reqId, fileId] of aiMatches.entries()) {
+        dispatch({
+          type: 'MATCH_FILE',
+          payload: { requirementId: reqId, fileId },
+        });
+      }
+      alert(`AI Match Complete! Found ${aiMatches.size} matches.`);
+    } catch (e: any) {
+      alert(`AI Auto-Match failed: ${e.message}`);
+      if (e.message.includes('API Key')) {
+        localStorage.removeItem('geminiApiKey');
+      }
+    } finally {
+      setIsAiMatching(false);
+    }
+  };
+
   return (
     <div className="bg-white rounded-2xl shadow-sm border border-zinc-200 p-6">
       <div className="flex justify-between items-center mb-6">
         <h2 className="text-lg font-semibold text-zinc-900">{t('requirements')}</h2>
         <div className="flex gap-2">
           {uploadedFiles.length > 0 && (
-            <button
-              onClick={() => dispatch({ type: 'AUTO_MATCH' })}
-              className="px-4 py-1.5 bg-zinc-100 text-zinc-800 rounded-full text-sm font-medium hover:bg-zinc-200 transition-colors cursor-pointer"
-            >
-              Auto-Match Files
-            </button>
+            <>
+              <button
+                onClick={() => dispatch({ type: 'AUTO_MATCH' })}
+                className="px-4 py-1.5 bg-zinc-100 text-zinc-800 rounded-full text-sm font-medium hover:bg-zinc-200 transition-colors cursor-pointer"
+              >
+                Auto-Match
+              </button>
+              <button
+                onClick={handleAiMatch}
+                disabled={isAiMatching}
+                className="px-4 py-1.5 bg-indigo-100 text-indigo-700 rounded-full text-sm font-medium hover:bg-indigo-200 transition-colors cursor-pointer disabled:opacity-50"
+              >
+                {isAiMatching ? 'Matching...' : 'Auto-Match (AI) 🪄'}
+              </button>
+            </>
           )}
           <button
             onClick={() => exportChecklistCsv(tenderData, uploadedFiles, matches, lang, t as any)}
