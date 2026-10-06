@@ -1,4 +1,5 @@
 import { PDFDocument, rgb, StandardFonts } from 'pdf-lib';
+import fontkit from '@pdf-lib/fontkit';
 import fileSaver from 'file-saver';
 const { saveAs } = fileSaver;
 import type { TenderData, UploadedFile, RequirementMatch } from '../types/tender';
@@ -12,11 +13,21 @@ export async function generatePackage(
 ) {
   const { tender, requirements } = tenderData;
   const mergedPdf = await PDFDocument.create();
+  mergedPdf.registerFontkit(fontkit);
   
   // 1. Create Cover Page
   const coverPage = mergedPdf.addPage([595.28, 841.89]); // A4 size
   const font = await mergedPdf.embedFont(StandardFonts.Helvetica);
   const boldFont = await mergedPdf.embedFont(StandardFonts.HelveticaBold);
+  
+  let bengaliFont: any = font;
+  try {
+    const fontBytes = await fetch('/NotoSansBengali-Regular.ttf').then(res => res.arrayBuffer());
+    bengaliFont = await mergedPdf.embedFont(fontBytes);
+  } catch (e) {
+    console.error('Failed to load Bengali font', e);
+  }
+
   const { height } = coverPage.getSize();
   
   // Load Signature Image if provided
@@ -34,11 +45,14 @@ export async function generatePackage(
   const margin = 50;
 
   const drawText = (text: string, size: number, isBold = false, xPos = margin) => {
+    // If text contains Bengali characters, use bengaliFont
+    const hasBengali = /[\u0980-\u09FF]/.test(text);
+    const selectedFont = hasBengali ? bengaliFont : (isBold ? boldFont : font);
     coverPage.drawText(text, {
       x: xPos,
       y,
       size,
-      font: isBold ? boldFont : font,
+      font: selectedFont,
       color: rgb(0, 0, 0),
     });
     y -= (size + 10);
@@ -71,11 +85,13 @@ export async function generatePackage(
   let indexY = height - 80;
 
   const drawIndexText = (text: string, size: number, isBold = false, xPos = margin) => {
+    const hasBengali = /[\u0980-\u09FF]/.test(text);
+    const selectedFont = hasBengali ? bengaliFont : (isBold ? boldFont : font);
     indexPage.drawText(text, {
       x: xPos,
       y: indexY,
       size,
-      font: isBold ? boldFont : font,
+      font: selectedFont,
       color: rgb(0, 0, 0),
     });
     indexY -= (size + 10);
