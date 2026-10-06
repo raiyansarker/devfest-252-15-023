@@ -20,21 +20,21 @@ export function RequirementsList() {
   );
 
   return (
-    <div className="bg-white rounded-lg shadow p-6">
-      <div className="flex justify-between items-center mb-4">
-        <h2 className="text-lg font-semibold">{t('requirements')}</h2>
+    <div className="bg-white rounded-2xl shadow-sm border border-zinc-200 p-6">
+      <div className="flex justify-between items-center mb-6">
+        <h2 className="text-lg font-semibold text-zinc-900">{t('requirements')}</h2>
         <div className="flex gap-2">
           {uploadedFiles.length > 0 && (
             <button
               onClick={() => dispatch({ type: 'AUTO_MATCH' })}
-              className="px-3 py-1 bg-gray-100 text-gray-700 rounded text-sm hover:bg-gray-200 transition-colors cursor-pointer"
+              className="px-4 py-1.5 bg-zinc-100 text-zinc-800 rounded-full text-sm font-medium hover:bg-zinc-200 transition-colors cursor-pointer"
             >
               Auto-Match Files
             </button>
           )}
           <button
             onClick={() => exportChecklistCsv(tenderData, uploadedFiles, matches, lang, t as any)}
-            className="px-3 py-1 bg-blue-100 text-blue-700 rounded text-sm hover:bg-blue-200 transition-colors cursor-pointer"
+            className="px-4 py-1.5 bg-zinc-900 text-white rounded-full text-sm font-medium hover:bg-zinc-800 transition-colors cursor-pointer shadow-sm"
           >
             Export CSV
           </button>
@@ -66,21 +66,21 @@ export function RequirementsList() {
               );
 
               return (
-                <tr key={req.id} className="border-b last:border-0">
-                  <td className="py-3 pr-3">{req.order}</td>
-                  <td className="py-3 pr-3">
+                <tr key={req.id} className="border-b border-zinc-100 last:border-0 hover:bg-zinc-50/50 transition-colors">
+                  <td className="py-4 pr-3 text-zinc-500 font-medium">{req.order}</td>
+                  <td className="py-4 pr-3 text-zinc-900">
                     <div>
                       {lang === 'bn' ? req.title_bn : req.title_en}
                       <span
-                        className={`ml-2 text-xs ${
-                          req.mandatory ? 'text-red-500' : 'text-gray-400'
+                        className={`ml-2 text-xs font-medium ${
+                          req.mandatory ? 'text-red-500' : 'text-zinc-400'
                         }`}
                       >
                         {req.mandatory ? '*' : `(${t('optional')})`}
                       </span>
                     </div>
                   </td>
-                  <td className="py-3 pr-3">
+                  <td className="py-4 pr-3">
                     <div className="flex items-center gap-2">
                       <select
                         value={match?.fileId ?? ''}
@@ -95,7 +95,7 @@ export function RequirementsList() {
                             dispatch({ type: 'UNMATCH', payload: req.id });
                           }
                         }}
-                        className="border rounded px-2 py-1 text-sm max-w-48"
+                        className="border border-zinc-200 rounded-lg px-3 py-1.5 text-sm max-w-48 bg-white text-zinc-900 focus:outline-none focus:ring-2 focus:ring-zinc-900/10 focus:border-zinc-400 transition-all"
                       >
                         <option value="">{t('selectFile')}</option>
                         {availableFiles.map((f) => (
@@ -109,7 +109,7 @@ export function RequirementsList() {
                           onClick={() =>
                             dispatch({ type: 'UNMATCH', payload: req.id })
                           }
-                          className="text-xs text-red-500 hover:text-red-700 cursor-pointer"
+                          className="text-xs font-medium text-red-500 hover:text-red-700 cursor-pointer transition-colors px-2 py-1 rounded-md hover:bg-red-50"
                         >
                           {t('unmatch')}
                         </button>
@@ -117,7 +117,7 @@ export function RequirementsList() {
                     </div>
                   </td>
                   {signatureDataUrl && (
-                    <td className="py-3 pr-3">
+                    <td className="py-4 pr-3">
                       {matchedFile && (
                         <input
                           type="checkbox"
@@ -125,12 +125,12 @@ export function RequirementsList() {
                           onChange={() =>
                             dispatch({ type: 'TOGGLE_SIGNATURE', payload: req.id })
                           }
-                          className="w-4 h-4 text-blue-600 rounded border-gray-300 focus:ring-blue-500"
+                          className="w-4 h-4 text-zinc-900 rounded border-zinc-300 focus:ring-zinc-900 focus:ring-offset-1 transition-all cursor-pointer"
                         />
                       )}
                     </td>
                   )}
-                  <td className="py-3 pr-3">
+                  <td className="py-4 pr-3">
                     {req.has_expiry && match?.fileId ? (
                       <input
                         type="date"

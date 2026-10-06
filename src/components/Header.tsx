@@ -7,8 +7,8 @@ export function Header() {
   const dispatch = useTenderDispatch();
 
   return (
-    <header className="bg-blue-700 text-white px-6 py-4 flex items-center justify-between shadow-md">
-      <h1 className="text-xl font-bold">{t('appTitle')}</h1>
+    <header className="bg-zinc-950 text-white px-6 py-4 flex items-center justify-between border-b border-zinc-800">
+      <h1 className="text-xl font-bold tracking-tight">{t('appTitle')}</h1>
       <div className="flex gap-4">
         {tenderData && (
           <button
@@ -17,14 +17,14 @@ export function Header() {
                 dispatch({ type: 'RESET_STATE' });
               }
             }}
-            className="px-4 py-1.5 bg-red-600 text-white rounded font-medium hover:bg-red-700 transition-colors cursor-pointer"
+            className="px-5 py-1.5 bg-red-500/10 text-red-500 rounded-full font-medium hover:bg-red-500/20 transition-colors cursor-pointer text-sm"
           >
             Start Over
           </button>
         )}
         <button
           onClick={() => setLang(lang === 'en' ? 'bn' : 'en')}
-          className="px-4 py-1.5 bg-white text-blue-700 rounded font-medium hover:bg-blue-50 transition-colors cursor-pointer"
+          className="px-5 py-1.5 bg-zinc-800 text-zinc-100 rounded-full font-medium hover:bg-zinc-700 transition-colors cursor-pointer text-sm shadow-sm border border-zinc-700"
         >
           {t('language')}
         </button>

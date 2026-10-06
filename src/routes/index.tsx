@@ -15,7 +15,7 @@ function Home() {
   const { t } = useI18n()
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-zinc-50 font-sans selection:bg-zinc-900 selection:text-white">
       <Header />
       <main className="max-w-5xl mx-auto px-4 py-6 space-y-6">
         {!tenderData && <TenderLoader />}

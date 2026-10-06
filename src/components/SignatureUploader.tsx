@@ -47,13 +47,13 @@ export function SignatureUploader() {
   );
 
   return (
-    <div className="bg-white rounded-lg shadow p-6 space-y-4 h-full flex flex-col">
+    <div className="bg-white rounded-2xl shadow-sm border border-zinc-200 p-6 space-y-4 h-full flex flex-col">
       <div className="flex justify-between items-center">
-        <h2 className="text-lg font-semibold">Seal or Signature</h2>
+        <h2 className="text-lg font-semibold text-zinc-900">Seal or Signature</h2>
         {signatureDataUrl && (
           <button
             onClick={() => dispatch({ type: 'SET_SIGNATURE', payload: null })}
-            className="text-red-500 hover:text-red-700 text-sm"
+            className="text-red-500 hover:text-red-700 text-sm font-medium"
           >
             Clear Signature
           </button>
@@ -65,11 +65,11 @@ export function SignatureUploader() {
           onDragOver={onDragOver}
           onDragLeave={onDragLeave}
           onDrop={onDrop}
-          className={`flex-1 flex flex-col items-center justify-center border-2 border-dashed rounded-lg p-6 text-center cursor-pointer transition-colors ${
-            dragOver ? 'border-blue-500 bg-blue-50' : 'border-gray-300 hover:border-blue-400'
+          className={`flex-1 flex flex-col items-center justify-center border-2 border-dashed rounded-xl p-6 text-center cursor-pointer transition-colors ${
+            dragOver ? 'border-zinc-900 bg-zinc-100' : 'border-zinc-300 hover:border-zinc-900'
           }`}
         >
-          <p className="text-gray-500">Click or drop a PNG signature image here</p>
+          <p className="text-zinc-500 font-medium">Click or drop a PNG signature image here</p>
           <input
             type="file"
             accept=".png,image/png"
@@ -81,7 +81,7 @@ export function SignatureUploader() {
           />
         </label>
       ) : (
-        <div className="border border-gray-200 rounded-lg p-4 bg-gray-50 flex items-center justify-center">
+        <div className="border border-zinc-200 rounded-xl p-4 bg-zinc-50 flex items-center justify-center h-full">
           <img
             src={signatureDataUrl}
             alt="Signature Preview"

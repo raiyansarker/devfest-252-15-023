@@ -115,20 +115,20 @@ export function FileUploader() {
   );
 
   return (
-    <div className="bg-white rounded-lg shadow p-6 space-y-4 h-full flex flex-col">
-      <h2 className="text-lg font-semibold">{t('uploadFiles')}</h2>
+    <div className="bg-white rounded-2xl shadow-sm border border-zinc-200 p-6 space-y-4 h-full flex flex-col">
+      <h2 className="text-lg font-semibold text-zinc-900">{t('uploadFiles')}</h2>
 
       <label
         onDragOver={onDragOver}
         onDragLeave={onDragLeave}
         onDrop={onDrop}
-        className={`flex-1 flex flex-col items-center justify-center border-2 border-dashed rounded-lg p-8 text-center cursor-pointer transition-colors ${
+        className={`flex-1 flex flex-col items-center justify-center border-2 border-dashed rounded-xl p-8 text-center cursor-pointer transition-colors ${
           dragOver
-            ? 'border-blue-500 bg-blue-50'
-            : 'border-gray-300 hover:border-blue-400'
+            ? 'border-zinc-900 bg-zinc-100'
+            : 'border-zinc-300 hover:border-zinc-900'
         }`}
       >
-        <p className={dragOver ? 'text-blue-600' : 'text-gray-500'}>
+        <p className={dragOver ? 'text-zinc-900 font-medium' : 'text-zinc-500'}>
           {t('dropOrClick')}
         </p>
         <input

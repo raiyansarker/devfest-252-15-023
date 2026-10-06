@@ -64,14 +64,14 @@ export function TenderLoader() {
       onDragOver={onDragOver}
       onDragLeave={onDragLeave}
       onDrop={onDrop}
-      className={`border-2 border-dashed rounded-lg p-12 text-center flex flex-col items-center justify-center cursor-pointer transition-colors ${
-        dragOver ? 'border-blue-500 bg-blue-50' : 'border-gray-300 hover:border-blue-400'
+      className={`border-2 border-dashed rounded-2xl p-16 text-center flex flex-col items-center justify-center cursor-pointer transition-colors ${
+        dragOver ? 'border-black bg-zinc-100' : 'border-zinc-300 hover:border-black'
       }`}
     >
-      <div className="inline-block px-6 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition-colors pointer-events-none">
+      <div className="inline-block px-8 py-2.5 bg-black text-white rounded-full font-medium hover:bg-zinc-800 transition-colors pointer-events-none shadow-sm">
         {t('loadRequirements')}
       </div>
-      <p className="mt-4 text-gray-500 pointer-events-none">Or drag and drop requirements.json here</p>
+      <p className="mt-4 text-zinc-500 pointer-events-none font-medium">Or drag and drop requirements.json here</p>
       <input
         type="file"
         accept=".json"
@@ -93,57 +93,59 @@ export function TenderInfo() {
   return (
     <div className="space-y-6">
       {/* Tender details card */}
-      <div className="bg-white rounded-lg shadow p-6">
-        <h2 className="text-lg font-semibold mb-4">{t('tenderDetails')}</h2>
-        <dl className="grid grid-cols-2 gap-x-6 gap-y-2 text-sm">
-          <dt className="font-medium text-gray-600">{t('tenderId')}</dt>
-          <dd>{tender.tender_id}</dd>
-          <dt className="font-medium text-gray-600">{t('tenderTitle')}</dt>
-          <dd>{tender.title}</dd>
-          <dt className="font-medium text-gray-600">{t('procuringEntity')}</dt>
-          <dd>{tender.procuring_entity}</dd>
-          <dt className="font-medium text-gray-600">{t('bidder')}</dt>
-          <dd>{tender.bidder}</dd>
-          <dt className="font-medium text-gray-600">{t('submissionDeadline')}</dt>
-          <dd>{tender.submission_deadline}</dd>
+      <div className="bg-white rounded-2xl shadow-sm border border-zinc-200 p-8">
+        <h2 className="text-xl font-bold tracking-tight mb-6">{t('tenderDetails')}</h2>
+        <dl className="grid grid-cols-1 sm:grid-cols-2 gap-x-8 gap-y-4 text-sm">
+          <dt className="font-semibold text-zinc-500">{t('tenderId')}</dt>
+          <dd className="font-medium">{tender.tender_id}</dd>
+          <dt className="font-semibold text-zinc-500">{t('tenderTitle')}</dt>
+          <dd className="font-medium">{tender.title}</dd>
+          <dt className="font-semibold text-zinc-500">{t('procuringEntity')}</dt>
+          <dd className="font-medium">{tender.procuring_entity}</dd>
+          <dt className="font-semibold text-zinc-500">{t('bidder')}</dt>
+          <dd className="font-medium">{tender.bidder}</dd>
+          <dt className="font-semibold text-zinc-500">{t('submissionDeadline')}</dt>
+          <dd className="font-medium">{tender.submission_deadline}</dd>
         </dl>
       </div>
 
       {/* Requirements list */}
-      <div className="bg-white rounded-lg shadow p-6">
-        <h2 className="text-lg font-semibold mb-4">{t('requirements')}</h2>
-        <table className="w-full text-sm">
-          <thead>
-            <tr className="border-b text-left text-gray-600">
-              <th className="pb-2 pr-4">{t('order')}</th>
-              <th className="pb-2 pr-4">ID</th>
-              <th className="pb-2 pr-4">{t('tenderTitle')}</th>
-              <th className="pb-2">{t('status')}</th>
-            </tr>
-          </thead>
-          <tbody>
-            {requirements.map((req) => (
-              <tr key={req.id} className="border-b last:border-0">
-                <td className="py-2 pr-4">{req.order}</td>
-                <td className="py-2 pr-4 font-mono">{req.id}</td>
-                <td className="py-2 pr-4">
-                  {lang === 'bn' ? req.title_bn : req.title_en}
-                </td>
-                <td className="py-2">
-                  <span
-                    className={`text-xs px-2 py-0.5 rounded ${
-                      req.mandatory
-                        ? 'bg-red-100 text-red-700'
-                        : 'bg-gray-100 text-gray-600'
-                    }`}
-                  >
-                    {req.mandatory ? t('mandatory') : t('optional')}
-                  </span>
-                </td>
+      <div className="bg-white rounded-2xl shadow-sm border border-zinc-200 p-8">
+        <h2 className="text-xl font-bold tracking-tight mb-6">{t('requirements')}</h2>
+        <div className="overflow-x-auto">
+          <table className="w-full text-sm">
+            <thead>
+              <tr className="border-b border-zinc-200 text-left text-zinc-500">
+                <th className="pb-3 pr-4 font-semibold">{t('order')}</th>
+                <th className="pb-3 pr-4 font-semibold">ID</th>
+                <th className="pb-3 pr-4 font-semibold">{t('tenderTitle')}</th>
+                <th className="pb-3 font-semibold">{t('status')}</th>
               </tr>
-            ))}
-          </tbody>
-        </table>
+            </thead>
+            <tbody>
+              {requirements.map((req) => (
+                <tr key={req.id} className="border-b border-zinc-100 last:border-0">
+                  <td className="py-4 pr-4 text-zinc-500">{req.order}</td>
+                  <td className="py-4 pr-4 font-mono text-zinc-500">{req.id}</td>
+                  <td className="py-4 pr-4 font-medium">
+                    {lang === 'bn' ? req.title_bn : req.title_en}
+                  </td>
+                  <td className="py-4">
+                    <span
+                      className={`text-xs px-2.5 py-1 rounded-full font-medium ${
+                        req.mandatory
+                          ? 'bg-zinc-900 text-white'
+                          : 'bg-zinc-100 text-zinc-600'
+                      }`}
+                    >
+                      {req.mandatory ? t('mandatory') : t('optional')}
+                    </span>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
       </div>
     </div>
   );
