@@ -47,7 +47,7 @@ export function SignatureUploader() {
   );
 
   return (
-    <div className="bg-white rounded-lg shadow p-6 space-y-4">
+    <div className="bg-white rounded-lg shadow p-6 space-y-4 h-full flex flex-col">
       <div className="flex justify-between items-center">
         <h2 className="text-lg font-semibold">Seal or Signature</h2>
         {signatureDataUrl && (
@@ -65,7 +65,7 @@ export function SignatureUploader() {
           onDragOver={onDragOver}
           onDragLeave={onDragLeave}
           onDrop={onDrop}
-          className={`block border-2 border-dashed rounded-lg p-6 text-center cursor-pointer transition-colors ${
+          className={`flex-1 flex flex-col items-center justify-center border-2 border-dashed rounded-lg p-6 text-center cursor-pointer transition-colors ${
             dragOver ? 'border-blue-500 bg-blue-50' : 'border-gray-300 hover:border-blue-400'
           }`}
         >

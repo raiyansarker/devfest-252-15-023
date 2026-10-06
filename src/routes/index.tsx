@@ -24,13 +24,19 @@ function Home() {
         )}
 
         {tenderData && (
-          <>
+          <div className="flex flex-col gap-6">
             <TenderInfo />
-            <FileUploader />
-            <SignatureUploader />
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div className="h-full">
+                <FileUploader />
+              </div>
+              <div className="h-full">
+                <SignatureUploader />
+              </div>
+            </div>
             <RequirementsList />
             <PackageGenerator />
-          </>
+          </div>
         )}
       </main>
     </div>
