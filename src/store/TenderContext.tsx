@@ -3,6 +3,7 @@ import {
   useContext,
   useReducer,
   useEffect,
+  useRef,
   type ReactNode,
   type Dispatch,
 } from 'react';
@@ -33,7 +34,8 @@ export type TenderAction =
   | { type: 'AUTO_MATCH' }
   | { type: 'SET_SIGNATURE'; payload: string | null }
   | { type: 'TOGGLE_SIGNATURE'; payload: string } // requirementId
-  | { type: 'RESTORE_STATE'; payload: TenderState };
+  | { type: 'RESTORE_STATE'; payload: TenderState }
+  | { type: 'RESET_STATE' };
 
 const initialState: TenderState = {
   tenderData: null,
@@ -144,6 +146,9 @@ function reducer(state: TenderState, action: TenderAction): TenderState {
     case 'RESTORE_STATE':
       return action.payload;
 
+    case 'RESET_STATE':
+      return initialState;
+
     default:
       return state;
   }
@@ -168,6 +173,7 @@ const TenderDispatchContext = createContext<Dispatch<TenderAction> | null>(null)
 
 export function TenderProvider({ children }: { children: ReactNode }) {
   const [state, dispatch] = useReducer(reducer, initialState);
+  const isInitialLoad = useRef(true);
 
   // Restore state on mount
   useEffect(() => {
@@ -177,12 +183,19 @@ export function TenderProvider({ children }: { children: ReactNode }) {
           dispatch({ type: 'RESTORE_STATE', payload: savedState });
         }
       })
-      .catch((e) => console.error('Failed to restore state', e));
+      .catch((e) => console.error('Failed to restore state', e))
+      .finally(() => {
+        isInitialLoad.current = false;
+      });
   }, []);
 
   // Save state on changes
   useEffect(() => {
-    if (state !== initialState) {
+    if (isInitialLoad.current) return;
+    
+    if (state === initialState) {
+      import('idb-keyval').then(({ del }) => del('tenderState').catch(e => console.error(e)));
+    } else {
       set('tenderState', state).catch((e) =>
         console.error('Failed to save state', e)
       );
