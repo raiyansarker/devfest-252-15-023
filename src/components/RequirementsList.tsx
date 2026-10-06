@@ -19,7 +19,17 @@ export function RequirementsList() {
 
   return (
     <div className="bg-white rounded-lg shadow p-6">
-      <h2 className="text-lg font-semibold mb-4">{t('requirements')}</h2>
+      <div className="flex justify-between items-center mb-4">
+        <h2 className="text-lg font-semibold">{t('requirements')}</h2>
+        {uploadedFiles.length > 0 && (
+          <button
+            onClick={() => dispatch({ type: 'AUTO_MATCH' })}
+            className="px-3 py-1 bg-gray-100 text-gray-700 rounded text-sm hover:bg-gray-200 transition-colors"
+          >
+            Auto-Match Files
+          </button>
+        )}
+      </div>
       <div className="overflow-x-auto">
         <table className="w-full text-sm">
           <thead>
