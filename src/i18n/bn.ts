@@ -1,7 +1,7 @@
 import type { TranslationKey } from './en';
 
 export const bn: Record<TranslationKey, string> = {
-  appTitle: 'টেন্ডার ডকুমেন্ট প্যাকেজ বিল্ডার',
+  appTitle: 'TenderPack',
   loadRequirements: 'requirements.json লোড করুন',
   tenderDetails: 'টেন্ডার বিবরণ',
   tenderId: 'টেন্ডার আইডি',

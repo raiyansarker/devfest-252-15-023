@@ -1,4 +1,4 @@
-# Tender Document Package Builder 📑
+# TenderPack 📑
 
 A completely **client-side** web application built for seamless management, organization, and packaging of tender document submissions. This app lets users drag and drop a `requirements.json` file, upload multiple PDF files, map them against tender requirements, validate constraints (like expiry dates), and instantly generate a compiled, indexed, and formatted final PDF package.
 

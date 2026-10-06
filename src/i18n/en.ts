@@ -1,5 +1,5 @@
 export const en = {
-  appTitle: 'Tender Document Package Builder',
+  appTitle: 'TenderPack',
   loadRequirements: 'Load requirements.json',
   tenderDetails: 'Tender Details',
   tenderId: 'Tender ID',
