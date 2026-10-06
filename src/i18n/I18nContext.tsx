@@ -1,4 +1,4 @@
-import { createContext, useContext, useState, type ReactNode } from 'react';
+import { createContext, useContext, useState, useEffect, type ReactNode } from 'react';
 import { en } from './en';
 import { bn } from './bn';
 import type { TranslationKey } from './en';
@@ -16,7 +16,19 @@ const translations = { en, bn } as const;
 const I18nContext = createContext<I18nContextValue | null>(null);
 
 export function I18nProvider({ children }: { children: ReactNode }) {
-  const [lang, setLang] = useState<Language>('en');
+  const [lang, setLang] = useState<Language>(() => {
+    if (typeof window !== 'undefined') {
+      const saved = localStorage.getItem('appLang');
+      if (saved === 'en' || saved === 'bn') return saved;
+    }
+    return 'en';
+  });
+
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      localStorage.setItem('appLang', lang);
+    }
+  }, [lang]);
 
   const t = (key: TranslationKey): string => translations[lang][key];
 
