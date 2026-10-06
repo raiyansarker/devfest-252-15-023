@@ -143,7 +143,7 @@ export async function generatePackage(
         mergedPdf.addPage(page);
         
         // Bonus: Draw signature if requested
-        if (signatureImage && match.applySignature !== false) {
+        if (signatureImage && match.applySignature) {
           const { width: pageWidth } = page.getSize();
           const sigDims = signatureImage.scale(0.5); // scale down
           page.drawImage(signatureImage, {

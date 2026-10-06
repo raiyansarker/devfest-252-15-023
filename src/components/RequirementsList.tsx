@@ -121,7 +121,7 @@ export function RequirementsList() {
                       {matchedFile && (
                         <input
                           type="checkbox"
-                          checked={match?.applySignature !== false}
+                          checked={match?.applySignature || false}
                           onChange={() =>
                             dispatch({ type: 'TOGGLE_SIGNATURE', payload: req.id })
                           }
