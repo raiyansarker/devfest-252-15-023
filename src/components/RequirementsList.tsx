@@ -3,6 +3,8 @@ import { useTender, useTenderDispatch } from '../store/TenderContext';
 import { computeStatus } from '../utils/statusEngine';
 import { StatusBadge } from './StatusBadge';
 
+import { exportChecklistCsv } from '../utils/csvExport';
+
 export function RequirementsList() {
   const { t, lang } = useI18n();
   const { tenderData, uploadedFiles, matches, signatureDataUrl } = useTender();
@@ -21,14 +23,22 @@ export function RequirementsList() {
     <div className="bg-white rounded-lg shadow p-6">
       <div className="flex justify-between items-center mb-4">
         <h2 className="text-lg font-semibold">{t('requirements')}</h2>
-        {uploadedFiles.length > 0 && (
+        <div className="flex gap-2">
+          {uploadedFiles.length > 0 && (
+            <button
+              onClick={() => dispatch({ type: 'AUTO_MATCH' })}
+              className="px-3 py-1 bg-gray-100 text-gray-700 rounded text-sm hover:bg-gray-200 transition-colors cursor-pointer"
+            >
+              Auto-Match Files
+            </button>
+          )}
           <button
-            onClick={() => dispatch({ type: 'AUTO_MATCH' })}
-            className="px-3 py-1 bg-gray-100 text-gray-700 rounded text-sm hover:bg-gray-200 transition-colors"
+            onClick={() => exportChecklistCsv(tenderData, uploadedFiles, matches, lang, t as any)}
+            className="px-3 py-1 bg-blue-100 text-blue-700 rounded text-sm hover:bg-blue-200 transition-colors cursor-pointer"
           >
-            Auto-Match Files
+            Export CSV
           </button>
-        )}
+        </div>
       </div>
       <div className="overflow-x-auto">
         <table className="w-full text-sm">
