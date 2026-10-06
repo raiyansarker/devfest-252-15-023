@@ -17,7 +17,7 @@ export function Header() {
                 dispatch({ type: 'RESET_STATE' });
               }
             }}
-            className="px-5 py-1.5 bg-red-500/10 text-red-500 rounded-full font-medium hover:bg-red-500/20 transition-colors cursor-pointer text-sm"
+            className="px-5 py-1.5 bg-white text-zinc-900 rounded-full font-medium hover:bg-zinc-200 transition-colors cursor-pointer text-sm shadow-sm"
           >
             Start Over
           </button>
