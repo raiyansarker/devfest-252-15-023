@@ -1,197 +1,81 @@
-Welcome to your new TanStack Start app!
+# Tender Document Package Builder 📑
 
-# Getting Started
+A completely **client-side** web application built for seamless management, organization, and packaging of tender document submissions. This app lets users drag and drop a `requirements.json` file, upload multiple PDF files, map them against tender requirements, validate constraints (like expiry dates), and instantly generate a compiled, indexed, and formatted final PDF package.
 
-To run this application:
+Designed for speed, privacy, and zero server costs—everything runs directly in your browser.
 
-```bash
-bun install
-bun --bun run dev
-```
+## ✨ Features
 
-# Building For Production
+### Core Requirements
+- **JSON & PDF Uploads:** Native support for dragging and dropping the `requirements.json` schema and bulk uploading PDF files (including entire folders).
+- **Validation Engine:** Validates mandatory vs. optional requirements, checks document expiry dates against the submission deadline, and provides visual status badges (Missing, OK, Expired, Expiry Needed).
+- **Duplicate Detection:** Generates SHA-256 hashes of uploaded files in the browser to detect and prevent duplicate document uploads.
+- **Bilingual Interface:** Fully localized in English and Bengali (বাংলা), seamlessly switching titles and UI elements.
+- **Client-Side PDF Generation:** Merges all mapped PDFs sequentially, injecting a formal Cover Page (English) and a dynamic Index Page (Bilingual) using `pdf-lib`.
+- **Global Footers:** Automatically injects the Tender ID and "Page X of Y" on every generated page.
 
-To build this application for production:
+### 🌟 Bonus Features Implemented
+1. **Seal & Signature Overlay:** Upload a transparent PNG signature or company seal. The generator automatically scales and stamps it onto the bottom-right corner of every generated page in the final PDF!
+2. **Auto-Match Algorithm:** Employs a robust Levenshtein distance matrix scoring system and bilingual keyword matching (with stop-words filter) to magically guess and assign uploaded PDFs to the correct requirements instantly.
+3. **Export Checklist as CSV:** Instantly export the current requirement list, matched file names, page counts, and live statuses to a clean `.csv` file for offline sharing and review.
+4. **State Persistence & "Start Over":** Your progress is automatically saved to the browser's `IndexedDB`. If you refresh or close the tab, everything—including your mapped PDFs—is restored. Want a clean slate? Hit the "Start Over" button.
+5. **Perfect Bengali Text Rendering in PDFs:** Standard PDF engines break Indic scripts. This app uses an advanced HTML5 Canvas text-to-image engine under the hood to ensure Bengali text on the PDF Index Page is shaped and rendered *flawlessly*.
 
-```bash
-bun --bun run build
-```
+## 🚀 Tech Stack
 
-## Styling
+- **Framework:** React 19 + TypeScript + Vite
+- **Routing:** TanStack Router (File-based routing)
+- **Styling:** Tailwind CSS (v4)
+- **State Management:** React Context API + `useReducer`
+- **PDF Manipulation:** `pdf-lib` (generation) & `pdfjs-dist` (parsing/page counts)
+- **Storage:** `idb-keyval` (IndexedDB for storing files offline)
+- **Other:** `file-saver` (CSV/PDF downloads)
 
-This project uses [Tailwind CSS](https://tailwindcss.com/) for styling.
+## 🛠️ Getting Started
 
-### Removing Tailwind CSS
+Because this application relies on no external backends, running it is incredibly simple.
 
-If you prefer not to use Tailwind CSS:
+### Prerequisites
+Make sure you have [Node.js](https://nodejs.org/) installed on your machine.
 
-1. Remove the demo pages in `src/routes/demo/`
-2. Replace the Tailwind import in `src/styles.css` with your own styles
-3. Remove `tailwindcss()` from the plugins array in `vite.config.ts`
-4. Remove `@tailwindcss/vite` and `tailwindcss` from `package.json`
+### Installation
 
+1. **Clone the repository:**
+   ```bash
+   git clone <repo-url>
+   cd devfest-252-15-023
+   ```
 
-## Deploy with Nitro
+2. **Install dependencies:**
+   ```bash
+   npm install
+   ```
 
-This project uses Nitro as a generic server adapter, so it can run on any Node-compatible host.
+3. **Run the development server:**
+   ```bash
+   npm run dev
+   ```
+
+4. **Open in Browser:**
+   Navigate to `http://localhost:3000` to start building your tender packages!
+
+## 📦 Building for Production
+
+To build a highly optimized static bundle:
 
 ```bash
 npm run build
-node dist/server/index.mjs
 ```
 
-The build output is a self-contained Node server. To deploy, push the `dist/` directory to your host (Render, Fly.io, your own VPS, etc.) and run the server command above.
+You can preview the built static assets using:
 
-For host-specific presets (Vercel, Netlify, Cloudflare, AWS Lambda, etc.) and tuning, see https://v3.nitro.build/deploy.
-
-
-
-## Routing
-
-This project uses [TanStack Router](https://tanstack.com/router) with file-based routing. Routes are managed as files in `src/routes`.
-
-### Adding A Route
-
-To add a new route to your application just add a new file in the `./src/routes` directory.
-
-TanStack will automatically generate the content of the route file for you.
-
-Now that you have two routes you can use a `Link` component to navigate between them.
-
-### Adding Links
-
-To use SPA (Single Page Application) navigation you will need to import the `Link` component from `@tanstack/react-router`.
-
-```tsx
-import { Link } from "@tanstack/react-router";
+```bash
+npm run preview
 ```
 
-Then anywhere in your JSX you can use it like so:
+## 🏗️ Architecture & Technical Decisions
+* **SSR Conflicts:** Originally configured with TanStack Start SSR, `pdfjs-dist` interacts poorly with Node's environment. The architecture was strategically shifted to lazy-load PDF parsing in the browser to guarantee stability.
+* **Canvas Bengali Shaping:** `pdf-lib` does not natively contain Complex Text Layout (CTL) engines required for South Asian scripts. We bypass this limitation by drawing text on a hidden DOM Canvas utilizing the browser's native HarfBuzz shaping engine, extracting the image buffer, and embedding it directly into the PDF.
 
-```tsx
-<Link to="/about">About</Link>
-```
-
-This will create a link that will navigate to the `/about` route.
-
-More information on the `Link` component can be found in the [Link documentation](https://tanstack.com/router/v1/docs/framework/react/api/router/linkComponent).
-
-### Using A Layout
-
-In the File Based Routing setup the layout is located in `src/routes/__root.tsx`. Anything you add to the root route will appear in all the routes. The route content will appear in the JSX where you render `{children}` in the `shellComponent`.
-
-Here is an example layout that includes a header:
-
-```tsx
-import { HeadContent, Scripts, createRootRoute } from '@tanstack/react-router'
-
-export const Route = createRootRoute({
-  head: () => ({
-    meta: [
-      { charSet: 'utf-8' },
-      { name: 'viewport', content: 'width=device-width, initial-scale=1' },
-      { title: 'My App' },
-    ],
-  }),
-  shellComponent: ({ children }) => (
-    <html lang="en">
-      <head>
-        <HeadContent />
-      </head>
-      <body>
-        <header>
-          <nav>
-            <Link to="/">Home</Link>
-            <Link to="/about">About</Link>
-          </nav>
-        </header>
-        {children}
-        <Scripts />
-      </body>
-    </html>
-  ),
-})
-```
-
-More information on layouts can be found in the [Layouts documentation](https://tanstack.com/router/latest/docs/framework/react/guide/routing-concepts#layouts).
-
-## Server Functions
-
-TanStack Start provides server functions that allow you to write server-side code that seamlessly integrates with your client components.
-
-```tsx
-import { createServerFn } from '@tanstack/react-start'
-
-const getServerTime = createServerFn({
-  method: 'GET',
-}).handler(async () => {
-  return new Date().toISOString()
-})
-
-// Use in a component
-function MyComponent() {
-  const [time, setTime] = useState('')
-  
-  useEffect(() => {
-    getServerTime().then(setTime)
-  }, [])
-  
-  return <div>Server time: {time}</div>
-}
-```
-
-## API Routes
-
-You can create API routes by using the `server` property in your route definitions:
-
-```tsx
-import { createFileRoute } from '@tanstack/react-router'
-import { json } from '@tanstack/react-start'
-
-export const Route = createFileRoute('/api/hello')({
-  server: {
-    handlers: {
-      GET: () => json({ message: 'Hello, World!' }),
-    },
-  },
-})
-```
-
-## Data Fetching
-
-There are multiple ways to fetch data in your application. You can use TanStack Query to fetch data from a server. But you can also use the `loader` functionality built into TanStack Router to load the data for a route before it's rendered.
-
-For example:
-
-```tsx
-import { createFileRoute } from '@tanstack/react-router'
-
-export const Route = createFileRoute('/people')({
-  loader: async () => {
-    const response = await fetch('https://swapi.dev/api/people')
-    return response.json()
-  },
-  component: PeopleComponent,
-})
-
-function PeopleComponent() {
-  const data = Route.useLoaderData()
-  return (
-    <ul>
-      {data.results.map((person) => (
-        <li key={person.name}>{person.name}</li>
-      ))}
-    </ul>
-  )
-}
-```
-
-Loaders simplify your data fetching logic dramatically. Check out more information in the [Loader documentation](https://tanstack.com/router/latest/docs/framework/react/guide/data-loading#loader-parameters).
-
-
-
-# Learn More
-
-You can learn more about all of the offerings from TanStack in the [TanStack documentation](https://tanstack.com).
-
-For TanStack Start specific documentation, visit [TanStack Start](https://tanstack.com/start).
+---
+*Built for the DevFest '25 Hackathon Challenge.*
