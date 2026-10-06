@@ -34,8 +34,16 @@ export async function generatePackage(
   let signatureImage: any = null;
   if (signatureDataUrl) {
     try {
-      const signatureBytes = await fetch(signatureDataUrl).then(res => res.arrayBuffer());
-      signatureImage = await mergedPdf.embedPng(signatureBytes);
+      const base64Data = signatureDataUrl.split(',')[1];
+      if (base64Data) {
+        const binaryString = atob(base64Data);
+        const len = binaryString.length;
+        const bytes = new Uint8Array(len);
+        for (let i = 0; i < len; i++) {
+          bytes[i] = binaryString.charCodeAt(i);
+        }
+        signatureImage = await mergedPdf.embedPng(bytes);
+      }
     } catch (e) {
       console.error('Failed to embed signature image', e);
     }
