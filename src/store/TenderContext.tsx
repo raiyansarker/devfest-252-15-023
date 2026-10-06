@@ -2,14 +2,17 @@ import {
   createContext,
   useContext,
   useReducer,
+  useEffect,
   type ReactNode,
   type Dispatch,
 } from 'react';
+import { get, set } from 'idb-keyval';
 import type {
   TenderData,
   UploadedFile,
   RequirementMatch,
 } from '../types/tender';
+import { autoMatchFiles } from '../utils/autoMatch';
 
 export interface TenderState {
   tenderData: TenderData | null;
@@ -29,7 +32,8 @@ export type TenderAction =
   | { type: 'MARK_DUPLICATES' }
   | { type: 'AUTO_MATCH' }
   | { type: 'SET_SIGNATURE'; payload: string | null }
-  | { type: 'TOGGLE_SIGNATURE'; payload: string }; // requirementId
+  | { type: 'TOGGLE_SIGNATURE'; payload: string } // requirementId
+  | { type: 'RESTORE_STATE'; payload: TenderState };
 
 const initialState: TenderState = {
   tenderData: null,
@@ -106,6 +110,25 @@ function reducer(state: TenderState, action: TenderAction): TenderState {
     case 'MARK_DUPLICATES':
       return markDuplicates(state);
 
+    case 'AUTO_MATCH': {
+      if (!state.tenderData) return state;
+      const suggestedMatches = autoMatchFiles(
+        state.tenderData.requirements,
+        state.uploadedFiles
+      );
+      
+      const newMatches = state.matches.map((m) => {
+        const fileId = suggestedMatches.get(m.requirementId);
+        // Only override if not already matched
+        if (fileId && !m.fileId) {
+          return { ...m, fileId };
+        }
+        return m;
+      });
+      
+      return { ...state, matches: newMatches };
+    }
+
     case 'SET_SIGNATURE':
       return { ...state, signatureDataUrl: action.payload };
 
@@ -117,6 +140,9 @@ function reducer(state: TenderState, action: TenderAction): TenderState {
       );
       return { ...state, matches };
     }
+
+    case 'RESTORE_STATE':
+      return action.payload;
 
     default:
       return state;
@@ -142,6 +168,27 @@ const TenderDispatchContext = createContext<Dispatch<TenderAction> | null>(null)
 
 export function TenderProvider({ children }: { children: ReactNode }) {
   const [state, dispatch] = useReducer(reducer, initialState);
+
+  // Restore state on mount
+  useEffect(() => {
+    get<TenderState>('tenderState')
+      .then((savedState) => {
+        if (savedState && savedState.tenderData) {
+          dispatch({ type: 'RESTORE_STATE', payload: savedState });
+        }
+      })
+      .catch((e) => console.error('Failed to restore state', e));
+  }, []);
+
+  // Save state on changes
+  useEffect(() => {
+    if (state !== initialState) {
+      set('tenderState', state).catch((e) =>
+        console.error('Failed to save state', e)
+      );
+    }
+  }, [state]);
+
   return (
     <TenderContext value={state}>
       <TenderDispatchContext value={dispatch}>
