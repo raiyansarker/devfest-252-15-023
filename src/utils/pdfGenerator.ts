@@ -64,8 +64,25 @@ export async function generatePackage(
   });
 
   y -= 20;
-  drawText('Included Documents:', 16, true);
-  y -= 10;
+  // Documents list moved to Index page
+
+  // 1.5 Create Index Page
+  const indexPage = mergedPdf.addPage([595.28, 841.89]);
+  let indexY = height - 80;
+
+  const drawIndexText = (text: string, size: number, isBold = false, xPos = margin) => {
+    indexPage.drawText(text, {
+      x: xPos,
+      y: indexY,
+      size,
+      font: isBold ? boldFont : font,
+      color: rgb(0, 0, 0),
+    });
+    indexY -= (size + 10);
+  };
+
+  drawIndexText('INDEX', 24, true);
+  indexY -= 20;
 
   // 2. Add Documents to Cover List & Merge PDFs
   const includedDocs: { reqTitle: string; startPage: number }[] = [];
@@ -79,10 +96,18 @@ export async function generatePackage(
     if (!file) continue;
 
     const reqTitle = lang === 'bn' ? req.title_bn : req.title_en;
-    includedDocs.push({ reqTitle, startPage: mergedPdf.getPageCount() + 1 });
+    const startPage = mergedPdf.getPageCount() + 1;
+    includedDocs.push({ reqTitle, startPage });
     
-    // Add to cover page list
-    drawText(`${req.order}. ${reqTitle}`, 12);
+    // Add to index page list
+    drawIndexText(`${req.order}. ${reqTitle}`, 12);
+    // Draw page number on the right
+    indexPage.drawText(`Page ${startPage}`, {
+      x: 500,
+      y: indexY + 22, // adjust for the subtraction in drawIndexText
+      size: 12,
+      font: font,
+    });
 
     // Merge PDF
     try {
