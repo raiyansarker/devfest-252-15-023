@@ -72,7 +72,7 @@ export function RequirementsList() {
                 disabled={isAiMatching}
                 className="px-4 py-1.5 bg-indigo-100 text-indigo-700 rounded-full text-sm font-medium hover:bg-indigo-200 transition-colors cursor-pointer disabled:opacity-50"
               >
-                {isAiMatching ? 'Matching...' : 'Auto-Match (AI) 🪄'}
+                {isAiMatching ? 'Matching...' : 'Auto-Match (AI)'}
               </button>
             </>
           )}
