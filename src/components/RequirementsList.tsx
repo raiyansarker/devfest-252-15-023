@@ -47,7 +47,7 @@ export function RequirementsList() {
               <th className="pb-2 pr-3">#</th>
               <th className="pb-2 pr-3">{t('tenderTitle')}</th>
               <th className="pb-2 pr-3">{t('matchFile')}</th>
-              {signatureDataUrl && <th className="pb-2 pr-3">Sign</th>}
+              {signatureDataUrl && <th className="pb-2 pr-3">Pages to Sign</th>}
               <th className="pb-2 pr-3">{t('expiryDate')}</th>
               <th className="pb-2">{t('status')}</th>
             </tr>
@@ -120,12 +120,13 @@ export function RequirementsList() {
                     <td className="py-3 pr-3">
                       {matchedFile && (
                         <input
-                          type="checkbox"
-                          checked={match?.applySignature !== false}
-                          onChange={() =>
-                            dispatch({ type: 'TOGGLE_SIGNATURE', payload: req.id })
+                          type="text"
+                          placeholder="e.g. 1, 3, all"
+                          value={match?.signaturePages ?? ''}
+                          onChange={(e) =>
+                            dispatch({ type: 'SET_SIGNATURE_PAGES', payload: { requirementId: req.id, pages: e.target.value } })
                           }
-                          className="w-4 h-4 text-blue-600 rounded border-gray-300 focus:ring-blue-500"
+                          className="w-24 px-2 py-1 border border-gray-300 rounded text-sm focus:ring-blue-500 focus:border-blue-500 outline-none"
                         />
                       )}
                     </td>

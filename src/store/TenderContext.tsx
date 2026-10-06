@@ -33,7 +33,8 @@ export type TenderAction =
   | { type: 'MARK_DUPLICATES' }
   | { type: 'AUTO_MATCH' }
   | { type: 'SET_SIGNATURE'; payload: string | null }
-  | { type: 'TOGGLE_SIGNATURE'; payload: string } // requirementId
+  | { type: 'TOGGLE_SIGNATURE'; payload: string } // Deprecated
+  | { type: 'SET_SIGNATURE_PAGES'; payload: { requirementId: string; pages: string } }
   | { type: 'RESTORE_STATE'; payload: TenderState }
   | { type: 'RESET_STATE' };
 
@@ -138,6 +139,16 @@ function reducer(state: TenderState, action: TenderAction): TenderState {
       const matches = state.matches.map((m) =>
         m.requirementId === action.payload
           ? { ...m, applySignature: m.applySignature === undefined ? false : !m.applySignature }
+          : m
+      );
+      return { ...state, matches };
+    }
+
+    case 'SET_SIGNATURE_PAGES': {
+      const { requirementId, pages } = action.payload;
+      const matches = state.matches.map((m) =>
+        m.requirementId === requirementId
+          ? { ...m, signaturePages: pages }
           : m
       );
       return { ...state, matches };

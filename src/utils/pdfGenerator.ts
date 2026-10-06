@@ -3,6 +3,35 @@ import fontkit from '@pdf-lib/fontkit';
 import fileSaver from 'file-saver';
 const { saveAs } = fileSaver;
 import type { TenderData, UploadedFile, RequirementMatch } from '../types/tender';
+import { drawBengaliText } from './bengaliTextRenderer';
+
+export function shouldApplySignature(pagesStr: string | undefined, pageIndex: number, totalPages: number): boolean {
+  if (!pagesStr || pagesStr.trim() === '') return false;
+  const str = pagesStr.trim().toLowerCase();
+  if (str === 'all') return true;
+  if (str === 'last') return pageIndex === totalPages - 1;
+  if (str === 'first') return pageIndex === 0;
+
+  const targetPage = pageIndex + 1;
+  const parts = str.split(',').map(s => s.trim());
+
+  for (const part of parts) {
+    if (part.includes('-')) {
+      const [startStr, endStr] = part.split('-');
+      const start = parseInt(startStr, 10);
+      const end = parseInt(endStr, 10);
+      if (!isNaN(start) && !isNaN(end) && targetPage >= start && targetPage <= end) {
+        return true;
+      }
+    } else {
+      const pageNum = parseInt(part, 10);
+      if (!isNaN(pageNum) && targetPage === pageNum) {
+        return true;
+      }
+    }
+  }
+  return false;
+}
 
 export async function generatePackage(
   tenderData: TenderData,
@@ -20,13 +49,7 @@ export async function generatePackage(
   const font = await mergedPdf.embedFont(StandardFonts.Helvetica);
   const boldFont = await mergedPdf.embedFont(StandardFonts.HelveticaBold);
   
-  let bengaliFont: any = font;
-  try {
-    const fontBytes = await fetch('/NotoSansBengali-Regular.ttf').then(res => res.arrayBuffer());
-    bengaliFont = await mergedPdf.embedFont(fontBytes);
-  } catch (e) {
-    console.error('Failed to load Bengali font', e);
-  }
+  // Bengali font is now handled via canvas text rendering
 
   const { height } = coverPage.getSize();
   
@@ -52,22 +75,24 @@ export async function generatePackage(
   let y = height - 80;
   const margin = 50;
 
-  const drawText = (text: string, size: number, isBold = false, xPos = margin) => {
-    // If text contains Bengali characters, use bengaliFont
+  const drawText = async (text: string, size: number, isBold = false, xPos = margin) => {
     const hasBengali = /[\u0980-\u09FF]/.test(text);
-    const selectedFont = hasBengali ? bengaliFont : (isBold ? boldFont : font);
-    coverPage.drawText(text, {
-      x: xPos,
-      y,
-      size,
-      font: selectedFont,
-      color: rgb(0, 0, 0),
-    });
+    if (hasBengali) {
+      await drawBengaliText(mergedPdf, coverPage, text, xPos, y, size, isBold);
+    } else {
+      coverPage.drawText(text, {
+        x: xPos,
+        y,
+        size,
+        font: isBold ? boldFont : font,
+        color: rgb(0, 0, 0),
+      });
+    }
     y -= (size + 10);
   };
 
   // Using English for cover page as per Section 6.1: "Page 1 is a cover page, in English."
-  drawText('TENDER DOCUMENT PACKAGE', 24, true);
+  await drawText('TENDER DOCUMENT PACKAGE', 24, true);
   y -= 20;
 
   const details = [
@@ -79,12 +104,11 @@ export async function generatePackage(
     ['Generated On:', new Date().toISOString().split('T')[0]],
   ];
 
-  details.forEach(([label, value]) => {
+  for (const [label, value] of details) {
     coverPage.drawText(label, { x: margin, y, size: 12, font: boldFont });
-    coverPage.drawText(value, { x: margin + 150, y, size: 12, font });
-    y -= 20;
-  });
-
+    await drawText(value, 12, false, margin + 150);
+  }
+  
   y -= 20;
   // Documents list moved to Index page
 
@@ -92,20 +116,23 @@ export async function generatePackage(
   const indexPage = mergedPdf.addPage([595.28, 841.89]);
   let indexY = height - 80;
 
-  const drawIndexText = (text: string, size: number, isBold = false, xPos = margin) => {
+  const drawIndexText = async (text: string, size: number, isBold = false, xPos = margin) => {
     const hasBengali = /[\u0980-\u09FF]/.test(text);
-    const selectedFont = hasBengali ? bengaliFont : (isBold ? boldFont : font);
-    indexPage.drawText(text, {
-      x: xPos,
-      y: indexY,
-      size,
-      font: selectedFont,
-      color: rgb(0, 0, 0),
-    });
+    if (hasBengali) {
+      await drawBengaliText(mergedPdf, indexPage, text, xPos, indexY, size, isBold);
+    } else {
+      indexPage.drawText(text, {
+        x: xPos,
+        y: indexY,
+        size,
+        font: isBold ? boldFont : font,
+        color: rgb(0, 0, 0),
+      });
+    }
     indexY -= (size + 10);
   };
 
-  drawIndexText('INDEX', 24, true);
+  await drawIndexText('INDEX', 24, true);
   indexY -= 20;
 
   // 2. Add Documents to Cover List & Merge PDFs
@@ -124,7 +151,7 @@ export async function generatePackage(
     includedDocs.push({ reqTitle, startPage });
     
     // Add to index page list
-    drawIndexText(`${req.order}. ${reqTitle}`, 12);
+    await drawIndexText(`${req.order}. ${reqTitle}`, 12);
     // Draw page number on the right
     indexPage.drawText(`Page ${startPage}`, {
       x: 500,
@@ -139,11 +166,11 @@ export async function generatePackage(
       const pdfToMerge = await PDFDocument.load(fileBuffer);
       const copiedPages = await mergedPdf.copyPages(pdfToMerge, pdfToMerge.getPageIndices());
       
-      copiedPages.forEach((page) => {
+      copiedPages.forEach((page, pageIndex) => {
         mergedPdf.addPage(page);
         
         // Bonus: Draw signature if requested
-        if (signatureImage && match.applySignature !== false) {
+        if (signatureImage && shouldApplySignature(match.signaturePages, pageIndex, copiedPages.length)) {
           const { width: pageWidth } = page.getSize();
           const sigDims = signatureImage.scale(0.5); // scale down
           page.drawImage(signatureImage, {
