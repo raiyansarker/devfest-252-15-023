@@ -43,7 +43,7 @@ export function PackageGenerator() {
   };
 
   return (
-    <div className="bg-white rounded-2xl shadow-sm border border-zinc-200 p-10 flex flex-col items-center justify-center text-center">
+    <div className="bg-white rounded-2xl shadow-xl shadow-zinc-200/50 border border-zinc-200 p-10 flex flex-col items-center justify-center text-center">
       {hasBlockingIssues ? (
         <>
           <div className="w-16 h-16 bg-red-50 text-red-500 rounded-full flex items-center justify-center mb-5 border border-red-100">
