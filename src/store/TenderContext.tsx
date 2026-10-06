@@ -15,6 +15,7 @@ export interface TenderState {
   tenderData: TenderData | null;
   uploadedFiles: UploadedFile[];
   matches: RequirementMatch[];
+  signatureDataUrl: string | null;
 }
 
 // ── Actions ──────────────────────────────────────────────────────────
@@ -26,12 +27,15 @@ export type TenderAction =
   | { type: 'UNMATCH'; payload: string } // requirementId
   | { type: 'SET_EXPIRY'; payload: { requirementId: string; date: string } }
   | { type: 'MARK_DUPLICATES' }
-  | { type: 'AUTO_MATCH' };
+  | { type: 'AUTO_MATCH' }
+  | { type: 'SET_SIGNATURE'; payload: string | null }
+  | { type: 'TOGGLE_SIGNATURE'; payload: string }; // requirementId
 
 const initialState: TenderState = {
   tenderData: null,
   uploadedFiles: [],
   matches: [],
+  signatureDataUrl: null,
 };
 
 function reducer(state: TenderState, action: TenderAction): TenderState {
@@ -101,6 +105,18 @@ function reducer(state: TenderState, action: TenderAction): TenderState {
 
     case 'MARK_DUPLICATES':
       return markDuplicates(state);
+
+    case 'SET_SIGNATURE':
+      return { ...state, signatureDataUrl: action.payload };
+
+    case 'TOGGLE_SIGNATURE': {
+      const matches = state.matches.map((m) =>
+        m.requirementId === action.payload
+          ? { ...m, applySignature: !m.applySignature }
+          : m
+      );
+      return { ...state, matches };
+    }
 
     default:
       return state;

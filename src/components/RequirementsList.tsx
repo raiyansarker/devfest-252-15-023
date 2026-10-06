@@ -5,7 +5,7 @@ import { StatusBadge } from './StatusBadge';
 
 export function RequirementsList() {
   const { t, lang } = useI18n();
-  const { tenderData, uploadedFiles, matches } = useTender();
+  const { tenderData, uploadedFiles, matches, signatureDataUrl } = useTender();
   const dispatch = useTenderDispatch();
 
   if (!tenderData) return null;
@@ -27,6 +27,7 @@ export function RequirementsList() {
               <th className="pb-2 pr-3">#</th>
               <th className="pb-2 pr-3">{t('tenderTitle')}</th>
               <th className="pb-2 pr-3">{t('matchFile')}</th>
+              {signatureDataUrl && <th className="pb-2 pr-3">Sign</th>}
               <th className="pb-2 pr-3">{t('expiryDate')}</th>
               <th className="pb-2">{t('status')}</th>
             </tr>
@@ -95,6 +96,20 @@ export function RequirementsList() {
                       )}
                     </div>
                   </td>
+                  {signatureDataUrl && (
+                    <td className="py-3 pr-3">
+                      {matchedFile && (
+                        <input
+                          type="checkbox"
+                          checked={match?.applySignature || false}
+                          onChange={() =>
+                            dispatch({ type: 'TOGGLE_SIGNATURE', payload: req.id })
+                          }
+                          className="w-4 h-4 text-blue-600 rounded border-gray-300 focus:ring-blue-500"
+                        />
+                      )}
+                    </td>
+                  )}
                   <td className="py-3 pr-3">
                     {req.has_expiry && match?.fileId ? (
                       <input

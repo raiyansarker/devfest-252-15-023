@@ -7,6 +7,7 @@ export async function generatePackage(
   tenderData: TenderData,
   uploadedFiles: UploadedFile[],
   matches: RequirementMatch[],
+  signatureDataUrl: string | null,
   lang: 'en' | 'bn'
 ) {
   const { tender, requirements } = tenderData;
@@ -18,6 +19,17 @@ export async function generatePackage(
   const boldFont = await mergedPdf.embedFont(StandardFonts.HelveticaBold);
   const { height } = coverPage.getSize();
   
+  // Load Signature Image if provided
+  let signatureImage: any = null;
+  if (signatureDataUrl) {
+    try {
+      const signatureBytes = await fetch(signatureDataUrl).then(res => res.arrayBuffer());
+      signatureImage = await mergedPdf.embedPng(signatureBytes);
+    } catch (e) {
+      console.error('Failed to embed signature image', e);
+    }
+  }
+
   let y = height - 80;
   const margin = 50;
 
@@ -77,7 +89,22 @@ export async function generatePackage(
       const fileBuffer = await file.file.arrayBuffer();
       const pdfToMerge = await PDFDocument.load(fileBuffer);
       const copiedPages = await mergedPdf.copyPages(pdfToMerge, pdfToMerge.getPageIndices());
-      copiedPages.forEach((page) => mergedPdf.addPage(page));
+      
+      copiedPages.forEach((page) => {
+        mergedPdf.addPage(page);
+        
+        // Bonus: Draw signature if requested
+        if (signatureImage && match.applySignature) {
+          const { width: pageWidth } = page.getSize();
+          const sigDims = signatureImage.scale(0.5); // scale down
+          page.drawImage(signatureImage, {
+            x: pageWidth - sigDims.width - 50, // 50px margin from right
+            y: 50, // 50px margin from bottom
+            width: sigDims.width,
+            height: sigDims.height,
+          });
+        }
+      });
     } catch (e) {
       console.error(`Failed to merge ${file.name}`, e);
     }

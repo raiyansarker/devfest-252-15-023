@@ -7,7 +7,7 @@ import { generatePackage } from '../utils/pdfGenerator';
 
 export function PackageGenerator() {
   const { t, lang } = useI18n();
-  const { tenderData, matches, uploadedFiles } = useTender();
+  const { tenderData, matches, uploadedFiles, signatureDataUrl } = useTender();
   const [isGenerating, setIsGenerating] = useState(false);
 
   if (!tenderData) return null;
@@ -33,7 +33,7 @@ export function PackageGenerator() {
     setIsGenerating(true);
     
     try {
-      await generatePackage(tenderData, uploadedFiles, matches, lang);
+      await generatePackage(tenderData, uploadedFiles, matches, signatureDataUrl, lang);
     } catch (error) {
       console.error('Error generating package:', error);
       alert('Failed to generate package. See console for details.');

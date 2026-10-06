@@ -2,6 +2,7 @@ import { createFileRoute } from '@tanstack/react-router'
 import { Header } from '../components/Header'
 import { TenderLoader, TenderInfo } from '../components/TenderInfo'
 import { FileUploader } from '../components/FileUploader'
+import { SignatureUploader } from '../components/SignatureUploader'
 import { RequirementsList } from '../components/RequirementsList'
 import { PackageGenerator } from '../components/PackageGenerator'
 import { useTender } from '../store/TenderContext'
@@ -26,6 +27,7 @@ function Home() {
           <>
             <TenderInfo />
             <FileUploader />
+            <SignatureUploader />
             <RequirementsList />
             <PackageGenerator />
           </>
