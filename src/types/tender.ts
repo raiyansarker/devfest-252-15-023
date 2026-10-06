@@ -36,8 +36,7 @@ export interface RequirementMatch {
   requirementId: string;
   fileId: string | null;
   expiryDate: string | null; // YYYY-MM-DD, only when has_expiry
-  applySignature?: boolean; // Deprecated
-  signaturePages?: string; // e.g. "1, 3", "all", "last"
+  applySignature?: boolean; // Bonus: apply seal/signature to this doc
 }
 
 /** Status per Section 5 of the problem */

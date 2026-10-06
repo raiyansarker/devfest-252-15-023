@@ -5,33 +5,6 @@ const { saveAs } = fileSaver;
 import type { TenderData, UploadedFile, RequirementMatch } from '../types/tender';
 import { drawBengaliText } from './bengaliTextRenderer';
 
-export function shouldApplySignature(pagesStr: string | undefined, pageIndex: number, totalPages: number): boolean {
-  if (!pagesStr || pagesStr.trim() === '') return false;
-  const str = pagesStr.trim().toLowerCase();
-  if (str === 'all') return true;
-  if (str === 'last') return pageIndex === totalPages - 1;
-  if (str === 'first') return pageIndex === 0;
-
-  const targetPage = pageIndex + 1;
-  const parts = str.split(',').map(s => s.trim());
-
-  for (const part of parts) {
-    if (part.includes('-')) {
-      const [startStr, endStr] = part.split('-');
-      const start = parseInt(startStr, 10);
-      const end = parseInt(endStr, 10);
-      if (!isNaN(start) && !isNaN(end) && targetPage >= start && targetPage <= end) {
-        return true;
-      }
-    } else {
-      const pageNum = parseInt(part, 10);
-      if (!isNaN(pageNum) && targetPage === pageNum) {
-        return true;
-      }
-    }
-  }
-  return false;
-}
 
 export async function generatePackage(
   tenderData: TenderData,
@@ -166,11 +139,11 @@ export async function generatePackage(
       const pdfToMerge = await PDFDocument.load(fileBuffer);
       const copiedPages = await mergedPdf.copyPages(pdfToMerge, pdfToMerge.getPageIndices());
       
-      copiedPages.forEach((page, pageIndex) => {
+      copiedPages.forEach((page) => {
         mergedPdf.addPage(page);
         
         // Bonus: Draw signature if requested
-        if (signatureImage && shouldApplySignature(match.signaturePages, pageIndex, copiedPages.length)) {
+        if (signatureImage && match.applySignature !== false) {
           const { width: pageWidth } = page.getSize();
           const sigDims = signatureImage.scale(0.5); // scale down
           page.drawImage(signatureImage, {
