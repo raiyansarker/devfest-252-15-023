@@ -3,6 +3,7 @@ import { Header } from '../components/Header'
 import { TenderLoader, TenderInfo } from '../components/TenderInfo'
 import { FileUploader } from '../components/FileUploader'
 import { RequirementsList } from '../components/RequirementsList'
+import { PackageGenerator } from '../components/PackageGenerator'
 import { useTender } from '../store/TenderContext'
 import { useI18n } from '../i18n/I18nContext'
 
@@ -26,6 +27,7 @@ function Home() {
             <TenderInfo />
             <FileUploader />
             <RequirementsList />
+            <PackageGenerator />
           </>
         )}
       </main>
