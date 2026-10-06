@@ -145,7 +145,10 @@ export async function generatePackage(
         // Bonus: Draw signature if requested
         if (signatureImage && match.applySignature) {
           const { width: pageWidth } = page.getSize();
-          const sigDims = signatureImage.scale(0.5); // scale down
+          const maxWidth = 120;
+          const maxHeight = 80;
+          const scale = Math.min(maxWidth / signatureImage.width, maxHeight / signatureImage.height, 1);
+          const sigDims = signatureImage.scale(scale);
           page.drawImage(signatureImage, {
             x: pageWidth - sigDims.width - 50, // 50px margin from right
             y: 50, // 50px margin from bottom
