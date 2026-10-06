@@ -27,3 +27,22 @@ export async function getPdfPageCount(buffer: ArrayBuffer): Promise<number> {
   doc.cleanup();
   return count;
 }
+
+/** Extract text from the first page of a PDF for AI analysis */
+export async function getPdfFirstPageText(buffer: ArrayBuffer): Promise<string> {
+  const pdfjs = await getPdfjs();
+  const doc = await pdfjs.getDocument({ data: new Uint8Array(buffer) }).promise;
+  try {
+    const page = await doc.getPage(1);
+    const content = await page.getTextContent();
+    // @ts-ignore
+    const text = content.items.map((item) => item.str).join(' ');
+    page.cleanup();
+    return text.substring(0, 3000); // Limit to 3000 chars to save tokens
+  } catch (e) {
+    console.error('Failed to extract PDF text', e);
+    return '';
+  } finally {
+    doc.cleanup();
+  }
+}
