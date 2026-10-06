@@ -10,11 +10,11 @@ export function FileUploader() {
   const dispatch = useTenderDispatch();
 
   const handleFiles = useCallback(
-    async (fileList: FileList) => {
+    async (filesArray: File[]) => {
       const newFiles: UploadedFile[] = [];
       const errors: string[] = [];
 
-      for (const file of Array.from(fileList)) {
+      for (const file of filesArray) {
         if (file.type !== 'application/pdf' && !file.name.toLowerCase().endsWith('.pdf')) {
           errors.push(`"${file.name}" ${t('notPdf')}`);
           continue;
@@ -50,6 +50,26 @@ export function FileUploader() {
     [dispatch, t]
   );
 
+  const getFilesFromEntry = async (entry: any): Promise<File[]> => {
+    if (entry.isFile) {
+      return new Promise((resolve) => {
+        entry.file((file: File) => resolve([file]));
+      });
+    } else if (entry.isDirectory) {
+      const dirReader = entry.createReader();
+      return new Promise((resolve) => {
+        dirReader.readEntries(async (entries: any[]) => {
+          let files: File[] = [];
+          for (const e of entries) {
+            files = files.concat(await getFilesFromEntry(e));
+          }
+          resolve(files);
+        });
+      });
+    }
+    return [];
+  };
+
   if (!tenderData) return null;
 
   const [dragOver, setDragOver] = useState(false);
@@ -67,12 +87,28 @@ export function FileUploader() {
   }, []);
 
   const onDrop = useCallback(
-    (e: React.DragEvent) => {
+    async (e: React.DragEvent) => {
       e.preventDefault();
       e.stopPropagation();
       setDragOver(false);
-      if (e.dataTransfer.files.length > 0) {
-        handleFiles(e.dataTransfer.files);
+
+      if (e.dataTransfer.items) {
+        let allDroppedFiles: File[] = [];
+        for (let i = 0; i < e.dataTransfer.items.length; i++) {
+          const item = e.dataTransfer.items[i];
+          if (item.kind === 'file') {
+            const entry = item.webkitGetAsEntry();
+            if (entry) {
+              const files = await getFilesFromEntry(entry);
+              allDroppedFiles = allDroppedFiles.concat(files);
+            }
+          }
+        }
+        if (allDroppedFiles.length > 0) {
+          handleFiles(allDroppedFiles);
+        }
+      } else if (e.dataTransfer.files.length > 0) {
+        handleFiles(Array.from(e.dataTransfer.files));
       }
     },
     [handleFiles]
@@ -99,7 +135,7 @@ export function FileUploader() {
           type="file"
           accept=".pdf"
           multiple
-          onChange={(e) => e.target.files && handleFiles(e.target.files)}
+          onChange={(e) => e.target.files && handleFiles(Array.from(e.target.files))}
           className="hidden"
         />
       </label>

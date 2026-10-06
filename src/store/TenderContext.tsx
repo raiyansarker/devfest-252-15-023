@@ -25,7 +25,8 @@ export type TenderAction =
   | { type: 'MATCH_FILE'; payload: { requirementId: string; fileId: string } }
   | { type: 'UNMATCH'; payload: string } // requirementId
   | { type: 'SET_EXPIRY'; payload: { requirementId: string; date: string } }
-  | { type: 'MARK_DUPLICATES' };
+  | { type: 'MARK_DUPLICATES' }
+  | { type: 'AUTO_MATCH' };
 
 const initialState: TenderState = {
   tenderData: null,
